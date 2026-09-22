@@ -1,0 +1,39 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: python ${{ matrix.python }} on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python: ["3.9", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+
+      # The built-in jobs must work on a bare interpreter: no pip step here.
+      - name: Run the test suite (nothing installed)
+        run: python -m unittest discover tests -v
+
+      - name: Show what this machine has
+        run: python -m nanowrap doctor
+
+      # The rest of the suite drives real programs. The runners already have
+      # most of them; this fills in what is missing.
+      - name: Install the programs the extra tests drive
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg imagemagick pandoc poppler-utils 7zip
+
+      - name: Run the tests again, now with the real programs
+        run: python -m unittest discover tests -v

@@ -1,0 +1,6 @@
+# This file is here so nobody has to wonder. There is nothing to install.
+#
+# nanoWrap's built-in jobs (packing, numbering, sizes) are plain Python.
+#
+# Everything runs on the Python that is already on the computer, on Windows,
+# macOS and Linux alike. Run it with:  python start.py

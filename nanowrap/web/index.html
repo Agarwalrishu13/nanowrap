@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>nanoWrap — the programs on your computer, with buttons</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧰</text></svg>">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <div class="brand-mark">🧰</div>
+    <div>
+      <div class="brand-name">nanoWrap</div>
+      <div class="brand-sub">The programs on your computer, with buttons</div>
+    </div>
+  </div>
+  <div class="grow"></div>
+  <span class="pill" id="machinePill">looking…</span>
+  <button class="btn ghost small" id="checkBtn">Check again</button>
+  <button class="btn ghost small" id="settingsBtn">⚙︎</button>
+</header>
+
+<nav class="steps" id="steps">
+  <button class="step" data-step="machine"><span>1</span> See what you have</button>
+  <button class="step" data-step="drop"><span>2</span> Drop a file in</button>
+  <button class="step" data-step="choose"><span>3</span> Choose a job</button>
+  <button class="step" data-step="result"><span>4</span> Take your file</button>
+</nav>
+
+<main id="main">
+
+  <!-- ------------------------------------------------- 1. what you have -->
+  <section class="panel" id="panel-machine">
+    <div class="card highlight">
+      <div class="label">No installation, ever</div>
+      <h2 id="machineHeadline">Looking at what is already on this computer…</h2>
+      <p class="lead" id="machineNote"></p>
+      <p class="muted">nanoWrap does not download or install anything. It finds the tools your
+        computer already has and puts friendly buttons on top of them. If one is missing, it
+        tells you the single line that gets it — and its own built-in tools work regardless.</p>
+      <div class="row" style="margin-top:12px">
+        <button class="btn primary big" id="toDropBtn">Next: drop a file in</button>
+        <button class="btn" id="showJobsBtn">See every job it can do</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>On this computer</h3>
+      <p class="muted" id="readySummary">…</p>
+      <div class="tool-grid" id="toolGrid"></div>
+    </div>
+
+    <div class="card" id="allJobsCard" hidden>
+      <h3>Every job nanoWrap can do</h3>
+      <p class="muted">Jobs whose program is missing are marked — they start working the moment
+        the program is installed.</p>
+      <div class="job-list" id="allJobs"></div>
+    </div>
+  </section>
+
+  <!-- ------------------------------------------------------ 2. drop a file -->
+  <section class="panel" id="panel-drop" hidden>
+    <div class="drop" id="drop">
+      <div class="drop-inner">
+        <div class="drop-icon">📥</div>
+        <h2>Drop your files here</h2>
+        <p>A video, some photos, a PDF, a zip, anything. Everything stays on this computer —
+          nothing is uploaded anywhere.</p>
+        <button class="btn primary" id="browseBtn">Choose files</button>
+        <input type="file" id="fileInput" multiple hidden>
+      </div>
+    </div>
+
+    <div class="card" id="droppedCard" hidden>
+      <h3>What you dropped in</h3>
+      <div class="file-list" id="fileList"></div>
+      <div class="row" style="margin-top:14px">
+        <button class="btn primary" id="toChooseBtn">Next: choose a job</button>
+        <button class="btn ghost" id="clearFilesBtn">Take them all out</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Nothing to hand?</h3>
+      <p class="muted">nanoWrap can make a few small practice files for you — including a short
+        test video, so you can try the video jobs without hunting for one.</p>
+      <div class="row">
+        <button class="btn" id="sampleBtn">Make me some practice files</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ----------------------------------------------------- 3. choose a job -->
+  <section class="panel" id="panel-choose" hidden>
+    <div class="card">
+      <h3 id="chooseHeadline">Your files</h3>
+      <p class="muted" id="chooseSummary"></p>
+      <div class="row">
+        <button class="btn ghost small" id="backToDropBtn">← Change the files</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>What would you like to do?</h3>
+      <p class="muted" id="chooseHint">These are the jobs that fit what you dropped.</p>
+      <div class="job-list" id="jobList"></div>
+      <div class="job-form" id="jobForm" hidden></div>
+      <div class="row" style="margin-top:16px" id="goRow" hidden>
+        <button class="btn primary big" id="goBtn">Do it</button>
+        <button class="btn ghost" id="cancelJobBtn">Pick a different job</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ---------------------------------------------------- 4. your file -->
+  <section class="panel" id="panel-result" hidden>
+    <div class="card" id="runningCard">
+      <div class="run-head">
+        <div class="spinner" id="runSpinner"></div>
+        <h2 id="runTitle">Working…</h2>
+        <button class="btn ghost small" id="stopBtn">Stop</button>
+      </div>
+      <div class="bar big-bar"><span id="runBar"></span></div>
+      <div class="log big" id="runLog"></div>
+      <details class="exact"><summary>Show me the exact command being run</summary>
+        <pre id="runCommand">…</pre></details>
+    </div>
+
+    <div class="card highlight" id="doneCard" hidden>
+      <div class="label">Done</div>
+      <h2 id="doneTitle">Your file is ready</h2>
+      <p class="lead" id="doneSentence"></p>
+      <div class="result-grid" id="resultGrid"></div>
+      <div class="row" style="margin-top:16px">
+        <button class="btn" id="revealBtn">Show me the folder</button>
+        <button class="btn ghost" id="againBtn">Do something else with these files</button>
+        <button class="btn ghost" id="startOverBtn">Start again</button>
+      </div>
+    </div>
+
+    <div class="card" id="failedCard" hidden>
+      <div class="label">It did not finish</div>
+      <h2 id="failedTitle">Something went wrong</h2>
+      <p class="lead" id="failedSentence"></p>
+      <div class="row" style="margin-top:12px">
+        <button class="btn" id="tryAgainBtn">Try a different job</button>
+        <button class="btn ghost" id="showLogBtn">Show me exactly what it said</button>
+      </div>
+      <div class="log" id="failedLog" hidden></div>
+    </div>
+
+    <div class="card">
+      <h3>Things you have made</h3>
+      <p class="muted">Kept in nanoWrap's own folder. It clears them out after a week so they
+        cannot quietly fill your disk.</p>
+      <div class="file-list" id="historyList"></div>
+    </div>
+  </section>
+</main>
+
+<div class="backdrop" id="settingsModal">
+  <div class="modal">
+    <div class="modal-head"><h2>Settings</h2>
+      <button class="btn ghost small" data-close="settingsModal">✕</button></div>
+    <div class="modal-body">
+      <div class="group">
+        <h3>Where your files live</h3>
+        <p class="help" id="folderInfo">…</p>
+        <div class="row"><button class="btn small" id="revealFolderBtn">Open that folder</button></div>
+      </div>
+      <div class="group">
+        <h3>How it behaves</h3>
+        <label class="switch"><input type="checkbox" id="openFolder"> Open the folder when a job finishes</label>
+        <div class="field">
+          <label for="keepDays">Throw away finished files after (days)</label>
+          <input type="number" id="keepDays" min="1" max="90" step="1">
+          <div class="hint">They are copies — your originals are never touched.</div>
+        </div>
+        <div class="field">
+          <label for="maxUpload">Largest file nanoWrap will accept (MB)</label>
+          <input type="number" id="maxUpload" min="50" max="20000" step="50">
+        </div>
+      </div>
+      <div class="group">
+        <h3>Tidy up</h3>
+        <p class="help">Removes everything nanoWrap has made, and forgets the list. Your own
+          files are never touched.</p>
+        <div class="row">
+          <button class="btn small" id="forgetHistoryBtn">Forget the list</button>
+          <button class="btn small" id="clearAllBtn">Throw away everything I made</button>
+        </div>
+        <div class="log" id="tidyLog"></div>
+      </div>
+      <div class="group">
+        <h3>Programs nanoWrap drives</h3>
+        <p class="help" id="aboutInfo">…</p>
+      </div>
+      <div class="group">
+        <h3>Other nano apps</h3>
+        <p class="help" id="siblingsInfo">…</p>
+      </div>
+    </div>
+    <div class="modal-foot"><button class="btn primary" data-close="settingsModal">Close</button></div>
+  </div>
+</div>
+
+<div class="toasts" id="toasts"></div>
+<script src="/app.js"></script>
+</body>
+</html>
