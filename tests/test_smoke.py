@@ -352,7 +352,8 @@ class TestBuiltinJobs(unittest.TestCase):
     def test_asking_how_big_things_are_writes_a_list(self):
         _job, outcome = self.run_it("sizes")
         report = outcome["made"][0]
-        text = open(report, encoding="utf-8").read()
+        with open(report, encoding="utf-8") as handle:
+            text = handle.read()
         self.assertIn("one.txt", text)
         self.assertIn("TOTAL", text)
 
@@ -686,7 +687,9 @@ class TestApi(ServerCase):
         self.post("/api/settings", {"open_folder_when_done": False})
 
     def test_forgetting_the_history_keeps_the_files(self):
-        self.post("/api/run", {"task": "pack", "files": [self.deliver("keep.txt")["path"]], "values": {}})
+        arrived = self.deliver("keep.txt")
+        started = self.post("/api/run", {"task": "pack", "files": [arrived["path"]], "values": {}})
+        self.wait_for(started["job_id"])          # history is written when a job finishes
         self.assertTrue(self.get("/api/history")["history"])
         self.post("/api/forget", {"what": "history"})
         self.assertEqual(self.get("/api/history")["history"], [])

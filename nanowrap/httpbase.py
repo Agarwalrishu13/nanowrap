@@ -196,10 +196,32 @@ class Router:
 # --------------------------------------------------------------------------
 # Server
 # --------------------------------------------------------------------------
+def _answers(host: str, port: int) -> bool:
+    """True when something on this computer already answers on that port.
+
+    Binding is not a reliable test on its own. On Windows, ``SO_REUSEADDR``
+    lets a second program bind a port that somebody else is already listening
+    on, with no error at all — the second program then sits on a port it does
+    not own and never receives a single visitor, while its own log cheerfully
+    says it is listening. Asking the port a question is what catches that.
+    """
+    target = "127.0.0.1" if host in ("0.0.0.0", "", "::") else host
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as probe:
+        probe.settimeout(0.35)
+        return probe.connect_ex((target, port)) == 0
+
+
 def free_port(preferred: int, host: str = "127.0.0.1", tries: int = 25) -> int:
-    """Return `preferred` if it is free, else the next free port after it."""
+    """Return `preferred` if it is free, else the next free port after it.
+
+    ``SO_REUSEADDR`` is kept on the probe so that a port left in TIME_WAIT by a
+    previous run can be taken straight back, rather than the app wandering off
+    to a new port every time it is restarted.
+    """
     for offset in range(tries):
         candidate = preferred + offset
+        if _answers(host, candidate):
+            continue
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as probe:
             probe.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             try:
